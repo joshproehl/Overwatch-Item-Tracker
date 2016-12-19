@@ -1,6 +1,6 @@
 OWI.factory('Data', function() {
-  var items = `{"legendary":{},"epic":{},"emotes":{},"intros":{},"sprays":{},"voicelines":{},"victoryposes":{},"icons":{}}`
-  var remainingCostsTemplate = `{"legendary":0,"epic":0,"emotes":0,"intros":0,"sprays":0,"voicelines":0,"victoryposes":0, "all":0}`
+  var items = `{"skinsLegendary":{},"skinsEpic":{},"emotes":{},"intros":{},"sprays":{},"voicelines":{},"victoryposes":{},"icons":{}}`
+  var remainingCostsTemplate = `{"skinsLegendary":0,"skinsEpic":0,"emotes":0,"intros":0,"sprays":0,"voicelines":0,"victoryposes":0, "all":0}`
   return {
     checked: {
       summergames2016: JSON.parse(items),
@@ -8,7 +8,9 @@ OWI.factory('Data', function() {
       winterwonderland2016: JSON.parse(items)
     },
     cost: {
-      winterwonderland2016: {"legendary":3000, "epic":750, "emotes":750, "intros":750, "sprays":75, "voicelines":75, "victoryposes":225}
+      // Lookup hashes for how much a particular class of item costs. Can be overridden by giving the item JSON a "costClass:" field matching
+      // an item in this hash.
+      winterwonderland2016: {"skinsLegendary":3000, "skinsEpic":750, "emotes":750, "intros":750, "sprays":75, "voicelines":75, "victoryposes":225}
     },
     remainingcost: {
       winterwonderland2016: JSON.parse(remainingCostsTemplate)
@@ -788,7 +790,7 @@ OWI.factory('Data', function() {
             "allClass": true
           }
         ],
-        "voice": [
+        "voicelines": [
           {
             "hero": "Ana",
             "name": "I'm watching out for you",
@@ -928,7 +930,7 @@ OWI.factory('Data', function() {
             "quality": "common"
           }
         ],
-        "poses": [
+        "victoryposes": [
           {
             "hero": "D.Va",
             "name": "Festive",

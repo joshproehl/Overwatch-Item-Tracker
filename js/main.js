@@ -33,9 +33,46 @@ OWI.factory("StorageService", function() {
       } else {
         service.settings = angular.fromJson(storedSettings);
       }
+    },
+
+    // This function should be called when loading data, and will manually make any schema changes we've had to make, allowing users
+    // with an old schema in their localstorage to keep their data.
+    // WARNING: These are *destructive* operations and will change existing user's localdata. This should be just fine as we're going
+    // to be very careful about when a migration is called though.
+    upgradeSchema: function() {
+      if(!service.data["schemaVersion"]) {
+        // Bring all three events in-line using the same "skinsEpic" and "skinsLegendary" keys everywhere.
+        service.data["summergames2016"]["skinsLegendary"] = service.data["summergames2016"]["legendary"];
+        delete service.data["summergames2016"]["legendary"];
+        service.data["summergames2016"]["skinsEpic"] = service.data["summergames2016"]["epic"];
+        delete service.data["summergames2016"]["epic"];
+
+        service.data["halloween2016"]["skinsLegendary"] = service.data["halloween2016"]["legendary"];
+        delete service.data["halloween2016"]["legendary"];
+        service.data["halloween2016"]["skinsEpic"] = service.data["halloween2016"]["epic"];
+        delete service.data["halloween2016"]["epic"];
+
+        service.data["winterwonderland2016"]["skinsLegendary"] = service.data["winterwonderland2016"]["legendary"];
+        delete service.data["winterwonderland2016"]["legendary"];
+        service.data["winterwonderland2016"]["skinsEpic"] = service.data["winterwonderland2016"]["epic"];
+        delete service.data["winterwonderland2016"]["epic"];
+
+        // Update WinterWonderland2016's nonstandard "voice" item type to the standard "voicelines"
+        service.data["winterwonderland2016"]["voicelines"] = service.data["winterwonderland2016"]["voice"];
+        delete service.data["winterwonderland2016"]["voice"];
+
+        // Update WinterWonderland2016's nonstandard "poses" item type to the standard "victoryposes"
+        service.data["winterwonderland2016"]["victoryposes"] = service.data["winterwonderland2016"]["poses"];
+        delete service.data["winterwonderland2016"]["poses"];
+
+        // we're correctly updated to new schema, set version so we don't call this migration again.
+        service.data["schemaVersion"] = 2;
+        service.persist();
+      }  // else if(service.data["schemaVersion"] == 2) { /* migration to schema v3 */ }
     }
   }
   service.init();
+  service.upgradeSchema();
   return service;
 })
 
@@ -109,55 +146,22 @@ OWI.directive("update", ["Data", "StorageService", function(Data, StorageService
 
       // We're keeping remaining costs cached and calculating them only when an item is changed.
       $scope.updateRemainingCosts = function() {
-        Object.keys($scope.checked).forEach(checkedItemClass => {
+        Object.keys($scope.checked).forEach(itemClass => {
+          console.log("Updating costs for "+itemClass);
           var numClassItemsOwned = 0;
-          Object.keys($scope.checked[checkedItemClass]).forEach(item => {
-            if($scope.checked[checkedItemClass][item] == true) {
+          Object.keys($scope.checked[itemClass]).forEach(item => {
+            if($scope.checked[itemClass][item] == true) {
               numClassItemsOwned++;
             }
           });
 
-          // We're going to have to do some gymnastics to figure out how many items total there are for this time of item.
-          // This is because the data source and the templates (models) do not match.
-          // Fixing that for for all existing users is an exercise perhaps left to someone more familiar with Angular than I, however
-          // in order to make this work we can simply create a mapping of the incorrect field/local-storage names so that we can find
-          // their matching data source items.
-          var dataItemClass = checkedItemClass;
-
-          // First we do the ones that are different for all events
-          switch(checkedItemClass) {
-            case "legendary":
-              dataItemClass = "skinsLegendary";
-              break;
-            case "epic":
-              dataItemClass = "skinsEpic";
-              break;
-          }
-
-          // Winter Wonderland 2016 specific issues
-          // Technically we don't need voicelines or victoryposes because those will be empty objects,
-          // but it's the simply way not to throw an error.
-          if($scope.data.id == "winterwonderland2016") {
-            switch(checkedItemClass) {
-              case "voicelines":
-                dataItemClass = "voice";
-                break;
-              case "victoryposes":
-                dataItemClass = "poses";
-                break;
-            }
-          }
-
-          if(!$scope.data.items[dataItemClass]) {
-            console.log("Could not locate data source for "+dataItemClass);
-          }
-
-          var numClassItems = Object.keys($scope.data.items[dataItemClass]).length;
-          console.log("Calculating remaining cost for "+checkedItemClass+"("+dataItemClass+"). User has "+numClassItemsOwned+" of "+numClassItems+".");
-          console.log($scope.data.items[dataItemClass]);
-          $scope.remainingcost[checkedItemClass] = (numClassItems - numClassItemsOwned)*$scope.cost[checkedItemClass];
-          console.log($scope.remainingcost);
+          var numClassItems = Object.keys($scope.data.items[itemClass]).length;
+          console.log("User has "+numClassItemsOwned+" of "+numClassItems+" from "+itemClass+", which cost "+$scope.cost[itemClass]+" each.");
+          $scope.remainingcost[itemClass] = (numClassItems - numClassItemsOwned)*$scope.cost[itemClass];
         });
+
+        console.log("Remaining costs are:");
+        console.log($scope.remainingcost);
 
         // Sum all these calculated costs into the total
         var totalCost = 0;
