@@ -98,10 +98,78 @@ OWI.directive("update", ["Data", "StorageService", function(Data, StorageService
       $scope.preview = false;
 
       $scope.checked = Data.checked[$scope.data.id];
+      $scope.cost = Data.cost[$scope.data.id];
+      $scope.remainingcost = Data.remainingcost[$scope.data.id];
 
       $scope.onSelect = function() {
         Data.checked[$scope.data.id] = $scope.checked;
         StorageService.setData(Data.checked);
+        $scope.updateRemainingCosts();
+      };
+
+      // We're keeping remaining costs cached and calculating them only when an item is changed.
+      $scope.updateRemainingCosts = function() {
+        Object.keys($scope.checked).forEach(checkedItemClass => {
+          var numClassItemsOwned = 0;
+          Object.keys($scope.checked[checkedItemClass]).forEach(item => {
+            if($scope.checked[checkedItemClass][item] == true) {
+              numClassItemsOwned++;
+            }
+          });
+
+          // We're going to have to do some gymnastics to figure out how many items total there are for this time of item.
+          // This is because the data source and the templates (models) do not match.
+          // Fixing that for for all existing users is an exercise perhaps left to someone more familiar with Angular than I, however
+          // in order to make this work we can simply create a mapping of the incorrect field/local-storage names so that we can find
+          // their matching data source items.
+          var dataItemClass = checkedItemClass;
+
+          // First we do the ones that are different for all events
+          switch(checkedItemClass) {
+            case "legendary":
+              dataItemClass = "skinsLegendary";
+              break;
+            case "epic":
+              dataItemClass = "skinsEpic";
+              break;
+          }
+
+          // Winter Wonderland 2016 specific issues
+          // Technically we don't need voicelines or victoryposes because those will be empty objects,
+          // but it's the simply way not to throw an error.
+          if($scope.data.id == "winterwonderland2016") {
+            switch(checkedItemClass) {
+              case "voicelines":
+                dataItemClass = "voice";
+                break;
+              case "victoryposes":
+                dataItemClass = "poses";
+                break;
+            }
+          }
+
+          if(!$scope.data.items[dataItemClass]) {
+            console.log("Could not locate data source for "+dataItemClass);
+          }
+
+          var numClassItems = Object.keys($scope.data.items[dataItemClass]).length;
+          console.log("Calculating remaining cost for "+checkedItemClass+"("+dataItemClass+"). User has "+numClassItemsOwned+" of "+numClassItems+".");
+          console.log($scope.data.items[dataItemClass]);
+          $scope.remainingcost[checkedItemClass] = (numClassItems - numClassItemsOwned)*$scope.cost[checkedItemClass];
+          console.log($scope.remainingcost);
+        });
+
+        // Sum all these calculated costs into the total
+        var totalCost = 0;
+        Object.keys($scope.remainingcost).forEach(itemClass => {
+          if(itemClass != "all") {
+            // Have to compare against NaN because we'll have some of the duplicate key names. (voice vs. voicelines, etc...)
+            if(!isNaN($scope.remainingcost[itemClass])) {
+              totalCost += $scope.remainingcost[itemClass];
+            }
+          }
+        });
+        $scope.remainingcost["all"] = totalCost;
       };
 
       var showTimeout = undefined;
@@ -126,6 +194,9 @@ OWI.directive("update", ["Data", "StorageService", function(Data, StorageService
           $scope.$digest();
         }, 150);
       };
+
+      // Make sure to calculate and show remaining costs on initial load.
+      $scope.updateRemainingCosts();
     }
   };
 }]);

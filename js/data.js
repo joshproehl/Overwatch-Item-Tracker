@@ -1,10 +1,17 @@
 OWI.factory('Data', function() {
   var items = `{"legendary":{},"epic":{},"emotes":{},"intros":{},"sprays":{},"voicelines":{},"victoryposes":{},"icons":{}}`
+  var remainingCostsTemplate = `{"legendary":0,"epic":0,"emotes":0,"intros":0,"sprays":0,"voicelines":0,"victoryposes":0, "all":0}`
   return {
     checked: {
       summergames2016: JSON.parse(items),
       halloween2016: JSON.parse(items),
       winterwonderland2016: JSON.parse(items)
+    },
+    cost: {
+      winterwonderland2016: {"legendary":3000, "epic":750, "emotes":750, "intros":750, "sprays":75, "voicelines":75, "victoryposes":225}
+    },
+    remainingcost: {
+      winterwonderland2016: JSON.parse(remainingCostsTemplate)
     },
     updates: [{
       name: 'Summer Games 2016',

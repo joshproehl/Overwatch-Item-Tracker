@@ -13,7 +13,7 @@
           </div>
         </div>
         <div class="inner" ng-class="{ hide: preview }">
-          <h2>Legendary Skins</h2> <span>(3000 Coins)</span>
+          <h2>Legendary Skins</h2> <span>({{cost.legendary}} Coins ea. {{remainingcost.legendary}} needed)</span>
           <div class="images">
             <div class="item" ng-repeat="skin in data.items.skinsLegendary track by $index" style="background-image:url({{skin.img}});">
               <div class="thing">
@@ -27,7 +27,7 @@
     </div>
     <div id="col2" class="col">
       <div id="voicelines" class="section">
-        <h2>Voice Lines</h2> <span>(75 Coins)</span>
+        <h2>Voice Lines</h2> <span>({{cost.voicelines}} Coins ea. {{remainingcost.voicelines}} needed)</span>
         <div class="items">
           <div class="item" ng-repeat="voice in data.items.voice track by $index">
             <input type="checkbox" id="{{'voice' + $index}}" ng-model="checked.voice[voice.id]" ng-change="onSelect()"> <label for="{{'voice' + $index}}"><h3>{{voice.hero}}</h3></label>
@@ -36,7 +36,7 @@
       </div>
       <div class="right">
         <div id="victoryposes" class="section">
-          <h2>Victory Poses</h2> <span>(225 Coins)</span>
+          <h2>Victory Poses</h2> <span>({{cost.victoryposes}} Coins ea. {{remainingcost.victoryposes}} needed)</span>
           <div class="items">
             <div class="item" ng-repeat="pose in data.items.poses track by $index" ng-mouseover="showPreview(pose)" ng-mouseleave="hidePreview()">
               <input type="checkbox" id="{{'pose' + $index}}" ng-model="checked.poses[pose.id]" ng-change="onSelect()"> <label for="{{'pose' + $index}}"><h3>{{pose.name}} {{pose.hero}}</h3></label>
@@ -58,7 +58,7 @@
     <div id="col1" class="col">
       <div class="left">
         <div id="epic-skins" class="section">
-          <h2>Epic Skins</h2> <span>(750 Coins)</span>
+          <h2>Epic Skins</h2> <span>({{cost.epic}} Coins ea. {{remainingcost.epic}} needed)</span>
           <div class="item" ng-repeat="skin in data.items.skinsEpic track by $index" ng-mouseover="showPreview(skin)" ng-mouseleave="hidePreview()">
             <input type="checkbox" id="{{'epic' + $index}}" ng-model="checked.epic[skin.id]" ng-change="onSelect()"> <label for="{{'epic' + $index}}"><h3>{{skin.name}} {{skin.hero}}</h3></label>
           </div>
@@ -66,13 +66,13 @@
       </div>
       <div class="right">
         <div id="highlight-intros" class="section">
-          <h2>Highlight Intros</h2> <span>(750 Coins)</span>
+          <h2>Highlight Intros</h2> <span>({{cost.intros}} Coins ea. {{remainingcost.intros}} needed)</span>
           <div class="item" ng-repeat="intro in data.items.intros track by $index" ng-mouseover="showPreview(intro)" ng-mouseleave="hidePreview()">
             <input type="checkbox" id="{{'intro' + $index}}" ng-model="checked.intros[intro.id]" ng-change="onSelect()"> <label for="{{'intro' + $index}}"><h3>{{intro.name}} {{intro.hero}}</h3></label>
           </div>
         </div>
         <div id="emotes" class="section">
-          <h2>Emotes</h2> <span>(750 Coins)</span>
+          <h2>Emotes</h2> <span>({{cost.emotes}} Coins ea. {{remainingcost.emotes}} needed)</span>
           <div class="item" ng-repeat="emote in data.items.emotes track by $index" ng-class="{legend: emote.legendary}" ng-mouseover="showPreview(emote)" ng-mouseleave="hidePreview()">
             <input type="checkbox" id="{{'emote' + $index}}" ng-model="checked.emotes[emote.id]" ng-change="onSelect()"> <label for="{{'emote' + $index}}"><h3>{{emote.name}} {{emote.hero}}</h3></label>
           </div>
@@ -81,7 +81,7 @@
     </div>
     <div id="col2" class="col">
       <div id="sprays" class="section">
-        <h2>Sprays</h2> <span>(75 Coins)</span>
+        <h2>Sprays</h2> <span>({{cost.sprays}} Coins ea. {{remainingcost.sprays}} needed)</span>
         <span id="ornamentinfo">
           <input type="checkbox" id="fakecb" style="display:none">
           <label for="fakecb" id="fakecheckbox"></label> <span> = Ornament Spray</span>
@@ -97,6 +97,9 @@
             </label>
           </div>
         </div>
+      </div>
+      <div id="totalcost" class="section">
+        <h2>Cost of all remaining items:</h2> <span>{{remainingcost.all}} coins</span>
       </div>
     </div>
   </div>
