@@ -33,9 +33,77 @@ OWI.factory("StorageService", function() {
       } else {
         service.settings = angular.fromJson(storedSettings);
       }
+    },
+
+    // This function should be called when loading data, and will manually make any schema changes we've had to make, allowing users
+    // with an old schema in their localstorage to keep their data.
+    // WARNING: These are *destructive* operations and will change existing user's localdata. This should be just fine as we're going
+    // to be very careful about when a migration is called though.
+    upgradeSchema: function() {
+      if(!service.data["schemaVersion"]) {  // Migration from no schema (original)
+        if(service.data["summergames2016"]) {
+
+          // standardize everything on "skinsLegendary"
+          if(service.data["summergames2016"]["legendary"]) {
+            service.data["summergames2016"]["skinsLegendary"] = service.data["summergames2016"]["legendary"];
+            delete service.data["summergames2016"]["legendary"];
+          }
+
+          // standardize everything on "skinsEpic"
+          if(service.data["summergames2016"]["epic"]) {
+            service.data["summergames2016"]["skinsEpic"] = service.data["summergames2016"]["epic"];
+            delete service.data["summergames2016"]["epic"];
+          }
+        }
+
+        if(service.data["halloween2016"]) {
+          // standardize everything on "skinsLegendary"
+          if(service.data["halloween2016"]["legendary"]) {
+            service.data["halloween2016"]["skinsLegendary"] = service.data["halloween2016"]["legendary"];
+            delete service.data["halloween2016"]["legendary"];
+          }
+
+          // standardize everything on "skinsEpic"
+          if(service.data["halloween2016"]["epic"]) {
+            service.data["halloween2016"]["skinsEpic"] = service.data["halloween2016"]["epic"];
+            delete service.data["halloween2016"]["epic"];
+          }
+        }
+
+        if(service.data["winterwonderland2016"]) {
+          // standardize everything on "skinsLegendary"
+          if(service.data["winterwonderland2016"]["legendary"]) {
+            service.data["winterwonderland2016"]["skinsLegendary"] = service.data["winterwonderland2016"]["legendary"];
+            delete service.data["winterwonderland2016"]["legendary"];
+          }
+
+          // standardize everything on "skinsEpic"
+          if(service.data["winterwonderland2016"]["epic"]) {
+            service.data["winterwonderland2016"]["skinsEpic"] = service.data["winterwonderland2016"]["epic"];
+            delete service.data["winterwonderland2016"]["epic"];
+          }
+
+          // Update WinterWonderland2016's nonstandard "voice" item type to the standard "voicelines"
+          if(service.data["winterwonderland2016"]["voice"]) {
+            service.data["winterwonderland2016"]["voicelines"] = service.data["winterwonderland2016"]["voice"];
+            delete service.data["winterwonderland2016"]["voice"];
+          }
+
+          // Update WinterWonderland2016's nonstandard "poses" item type to the standard "victoryposes"
+          if(service.data["winterwonderland2016"]["poses"]) {
+            service.data["winterwonderland2016"]["victoryposes"] = service.data["winterwonderland2016"]["poses"];
+            delete service.data["winterwonderland2016"]["poses"];
+          }
+        }
+
+        // we're correctly updated to new schema, set version so we don't call this migration again.
+        service.data["schemaVersion"] = 2;
+        service.persist();
+      }  // else if(service.data["schemaVersion"] == 2) { /* migration to schema v3 */ }
     }
   }
   service.init();
+  service.upgradeSchema();
   return service;
 })
 
@@ -98,10 +166,68 @@ OWI.directive("update", ["Data", "StorageService", function(Data, StorageService
       $scope.preview = false;
 
       $scope.checked = Data.checked[$scope.data.id];
+      $scope.cost = Data.cost[$scope.data.id];
+      $scope.remainingcost = Data.remainingcost[$scope.data.id];
 
       $scope.onSelect = function() {
         Data.checked[$scope.data.id] = $scope.checked;
         StorageService.setData(Data.checked);
+        $scope.updateRemainingCosts();
+      };
+
+      // We're keeping remaining costs cached and calculating them only when an item is changed.
+      $scope.updateRemainingCosts = function() {
+        Object.keys($scope.data.items).forEach(dataItemClass => {
+          $scope.remainingcost[dataItemClass] = 0;
+
+          angular.forEach($scope.data.items[dataItemClass], function(dataItem, dataKey) {
+            if(!dataItem.unlockOnly) {
+              var itemCost;
+              if(dataItem.costClass) {
+                itemCost = $scope.cost[dataItem.costClass];
+              } else {
+                itemCost = $scope.cost[dataItemClass];
+              }
+
+              // If the item is not in the checked list yet, OR is set to false (unchecked) we add it's cost to the remaining
+              if(!$scope.checked[dataItemClass][dataItem.id] || $scope.checked[dataItemClass][dataItem.id] == false) {
+                $scope.remainingcost[dataItemClass] += itemCost;
+              }
+            }
+          });
+        });
+
+        // Handle the extra ornament sprays from winterwonderland2016
+        // Ideally these would be their own sprays in the data source, but I'm not ready to refactor quite that much yet.
+        if($scope.data.id === "winterwonderland2016") {
+          angular.forEach($scope.data.items["sprays"], function(dataItem, dataKey) {
+            if(!dataItem.unlockOnly) {
+              if(dataItem.hero) {
+                var itemCost;
+                if(dataItem.costClass) {
+                  itemCost = $scope.cost[dataItem.costClass];
+                } else {
+                  itemCost = $scope.cost["sprays"];
+                }
+
+                // If the item is not in the checked list yet, OR is set to false (unchecked) we add it's cost to the remaining
+                if(!$scope.checked["sprays"][dataItem.id+"-ornament"] || $scope.checked["sprays"][dataItem.id+"-ornament"] == false) {
+                  $scope.remainingcost["sprays"] += itemCost;
+                }
+              }
+            }
+          });
+        }
+
+
+        // Sum all these calculated costs into the total
+        var totalCost = 0;
+        Object.keys($scope.remainingcost).forEach(itemClass => {
+          if(itemClass != "all") {
+            totalCost += $scope.remainingcost[itemClass];
+          }
+        });
+        $scope.remainingcost["all"] = totalCost;
       };
 
       var showTimeout = undefined;
@@ -126,6 +252,9 @@ OWI.directive("update", ["Data", "StorageService", function(Data, StorageService
           $scope.$digest();
         }, 150);
       };
+
+      // Make sure to calculate and show remaining costs on initial load.
+      $scope.updateRemainingCosts();
     }
   };
 }]);

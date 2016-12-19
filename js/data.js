@@ -1,10 +1,23 @@
 OWI.factory('Data', function() {
-  var items = `{"legendary":{},"epic":{},"emotes":{},"intros":{},"sprays":{},"voicelines":{},"victoryposes":{},"icons":{}}`
+  var items = `{"skinsLegendary":{},"skinsEpic":{},"emotes":{},"intros":{},"sprays":{},"voicelines":{},"victoryposes":{},"icons":{}}`
+  var remainingCostsTemplate = `{"skinsLegendary":0,"skinsEpic":0,"emotes":0,"intros":0,"sprays":0,"voicelines":0,"victoryposes":0, "icons":0, "all":0}`
   return {
     checked: {
       summergames2016: JSON.parse(items),
       halloween2016: JSON.parse(items),
       winterwonderland2016: JSON.parse(items)
+    },
+    cost: {
+      // Lookup hashes for how much a particular class of item costs. Can be overridden by giving the item JSON a "costClass:" field matching
+      // an item in this hash.
+      summergames2016: {"skinsLegendary":0, "skinsEpic":0, "emotes":0, "intros":0, "sprays":0, "voicelines":0, "victoryposes":0, "icons":0}, // NOTE: These weren't purchasable, all prices 0 so functions calling price lookup work
+      halloween2016: {"skinsLegendary":3000, "skinsEpic":750, "emotes":750, "intros":750, "sprays":75, "voicelines":75, "victoryposes":225, "icons":0}, // TODO: Were these prices correct?
+      winterwonderland2016: {"skinsLegendary":3000, "skinsEpic":750, "emotes":750, "intros":750, "sprays":75, "voicelines":75, "victoryposes":225, "icons":0}
+    },
+    remainingcost: {
+      summergames2016: JSON.parse(remainingCostsTemplate),
+      halloween2016: JSON.parse(remainingCostsTemplate),
+      winterwonderland2016: JSON.parse(remainingCostsTemplate)
     },
     updates: [{
       name: 'Summer Games 2016',
@@ -754,34 +767,39 @@ OWI.factory('Data', function() {
             "name": "Winter Wonderland",
             "id": "winter-wonderland",
             "img": "./resources/WINTER_WONDERLAND_2016/sprays/winter-wonderland.png",
-            "allClass": true
+            "allClass": true,
+            "unlockOnly": true
           },
           {
             "name": "SnowReaper",
             "id": "snowreaper",
             "img": "./resources/WINTER_WONDERLAND_2016/sprays/snowreaper.png",
-            "allClass": true
+            "allClass": true,
+            "unlockOnly": true
           },
           {
             "name": "SnowMei",
             "id": "snowmei",
             "img": "./resources/WINTER_WONDERLAND_2016/sprays/snowmei.png",
-            "allClass": true
+            "allClass": true,
+            "unlockOnly": true
           },
           {
             "name": "SnowHog",
             "id": "snowhog",
             "img": "./resources/WINTER_WONDERLAND_2016/sprays/snowhog.png",
-            "allClass": true
+            "allClass": true,
+            "unlockOnly": true
           },
           {
             "name": "SnowCree",
             "id": "snowcree",
             "img": "./resources/WINTER_WONDERLAND_2016/sprays/snowcree.png",
-            "allClass": true
+            "allClass": true,
+            "unlockOnly": true
           }
         ],
-        "voice": [
+        "voicelines": [
           {
             "hero": "Ana",
             "name": "I'm watching out for you",
@@ -921,7 +939,7 @@ OWI.factory('Data', function() {
             "quality": "common"
           }
         ],
-        "poses": [
+        "victoryposes": [
           {
             "hero": "D.Va",
             "name": "Festive",
