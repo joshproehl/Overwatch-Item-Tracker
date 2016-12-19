@@ -41,29 +41,60 @@ OWI.factory("StorageService", function() {
     // to be very careful about when a migration is called though.
     upgradeSchema: function() {
       if(!service.data["schemaVersion"]) {
-        // Bring all three events in-line using the same "skinsEpic" and "skinsLegendary" keys everywhere.
-        service.data["summergames2016"]["skinsLegendary"] = service.data["summergames2016"]["legendary"];
-        delete service.data["summergames2016"]["legendary"];
-        service.data["summergames2016"]["skinsEpic"] = service.data["summergames2016"]["epic"];
-        delete service.data["summergames2016"]["epic"];
+        if(service.data["summergames2016"]) {
 
-        service.data["halloween2016"]["skinsLegendary"] = service.data["halloween2016"]["legendary"];
-        delete service.data["halloween2016"]["legendary"];
-        service.data["halloween2016"]["skinsEpic"] = service.data["halloween2016"]["epic"];
-        delete service.data["halloween2016"]["epic"];
+          // standardize everything on "skinsLegendary"
+          if(service.data["summergames2016"]["legendary"]) {
+            service.data["summergames2016"]["skinsLegendary"] = service.data["summergames2016"]["legendary"];
+            delete service.data["summergames2016"]["legendary"];
+          }
 
-        service.data["winterwonderland2016"]["skinsLegendary"] = service.data["winterwonderland2016"]["legendary"];
-        delete service.data["winterwonderland2016"]["legendary"];
-        service.data["winterwonderland2016"]["skinsEpic"] = service.data["winterwonderland2016"]["epic"];
-        delete service.data["winterwonderland2016"]["epic"];
+          // standardize everything on "skinsEpic"
+          if(service.data["summergames2016"]["epic"]) {
+            service.data["summergames2016"]["skinsEpic"] = service.data["summergames2016"]["epic"];
+            delete service.data["summergames2016"]["epic"];
+          }
+        }
 
-        // Update WinterWonderland2016's nonstandard "voice" item type to the standard "voicelines"
-        service.data["winterwonderland2016"]["voicelines"] = service.data["winterwonderland2016"]["voice"];
-        delete service.data["winterwonderland2016"]["voice"];
+        if(service.data["halloween2016"]) {
+          // standardize everything on "skinsLegendary"
+          if(service.data["halloween2016"]["legendary"]) {
+            service.data["halloween2016"]["skinsLegendary"] = service.data["halloween2016"]["legendary"];
+            delete service.data["halloween2016"]["legendary"];
+          }
 
-        // Update WinterWonderland2016's nonstandard "poses" item type to the standard "victoryposes"
-        service.data["winterwonderland2016"]["victoryposes"] = service.data["winterwonderland2016"]["poses"];
-        delete service.data["winterwonderland2016"]["poses"];
+          // standardize everything on "skinsEpic"
+          if(service.data["halloween2016"]["epic"]) {
+            service.data["halloween2016"]["skinsEpic"] = service.data["halloween2016"]["epic"];
+            delete service.data["halloween2016"]["epic"];
+          }
+        }
+
+        if(service.data["winterwonderland2016"]) {
+          // standardize everything on "skinsLegendary"
+          if(service.data["winterwonderland2016"]["legendary"]) {
+            service.data["winterwonderland2016"]["skinsLegendary"] = service.data["winterwonderland2016"]["legendary"];
+            delete service.data["winterwonderland2016"]["legendary"];
+          }
+
+          // standardize everything on "skinsEpic"
+          if(service.data["winterwonderland2016"]["epic"]) {
+            service.data["winterwonderland2016"]["skinsEpic"] = service.data["winterwonderland2016"]["epic"];
+            delete service.data["winterwonderland2016"]["epic"];
+          }
+
+          // Update WinterWonderland2016's nonstandard "voice" item type to the standard "voicelines"
+          if(service.data["winterwonderland2016"]["voice"]) {
+            service.data["winterwonderland2016"]["voicelines"] = service.data["winterwonderland2016"]["voice"];
+            delete service.data["winterwonderland2016"]["voice"];
+          }
+
+          // Update WinterWonderland2016's nonstandard "poses" item type to the standard "victoryposes"
+          if(service.data["winterwonderland2016"]["poses"]) {
+            service.data["winterwonderland2016"]["victoryposes"] = service.data["winterwonderland2016"]["poses"];
+            delete service.data["winterwonderland2016"]["poses"];
+          }
+        }
 
         // we're correctly updated to new schema, set version so we don't call this migration again.
         service.data["schemaVersion"] = 2;
