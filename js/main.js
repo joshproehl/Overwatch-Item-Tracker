@@ -40,7 +40,7 @@ OWI.factory("StorageService", function() {
     // WARNING: These are *destructive* operations and will change existing user's localdata. This should be just fine as we're going
     // to be very careful about when a migration is called though.
     upgradeSchema: function() {
-      if(!service.data["schemaVersion"]) {
+      if(!service.data["schemaVersion"]) {  // Migration from no schema (original)
         if(service.data["summergames2016"]) {
 
           // standardize everything on "skinsLegendary"

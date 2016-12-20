@@ -10,9 +10,13 @@ OWI.factory('Data', function() {
     cost: {
       // Lookup hashes for how much a particular class of item costs. Can be overridden by giving the item JSON a "costClass:" field matching
       // an item in this hash.
+      summergames2016: {"skinsLegendary":0, "skinsEpic":0, "emotes":0, "intros":0, "sprays":0, "voicelines":0, "victoryposes":0, "icons":0}, // NOTE: These weren't purchasable, all prices 0 so functions calling price lookup work
+      halloween2016: {"skinsLegendary":3000, "skinsEpic":750, "emotes":750, "intros":750, "sprays":75, "voicelines":75, "victoryposes":225, "icons":0}, // TODO: Were these prices correct?
       winterwonderland2016: {"skinsLegendary":3000, "skinsEpic":750, "emotes":750, "intros":750, "sprays":75, "voicelines":75, "victoryposes":225, "icons":0}
     },
     remainingcost: {
+      summergames2016: JSON.parse(remainingCostsTemplate),
+      halloween2016: JSON.parse(remainingCostsTemplate),
       winterwonderland2016: JSON.parse(remainingCostsTemplate)
     },
     updates: [{
