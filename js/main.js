@@ -177,31 +177,29 @@ OWI.directive("update", ["Data", "StorageService", function(Data, StorageService
 
       // We're keeping remaining costs cached and calculating them only when an item is changed.
       $scope.updateRemainingCosts = function() {
-        Object.keys($scope.checked).forEach(itemClass => {
-          console.log("Updating costs for "+itemClass);
-          var numClassItemsOwned = 0;
-          Object.keys($scope.checked[itemClass]).forEach(item => {
-            if($scope.checked[itemClass][item] == true) {
-              numClassItemsOwned++;
+        Object.keys($scope.data.items).forEach(dataItemClass => {
+          $scope.remainingcost[dataItemClass] = 0;
+
+          angular.forEach($scope.data.items[dataItemClass], function(dataItem, dataKey) {
+            var itemCost;
+            if(dataItem.costClass) {
+              itemCost = $scope.cost[dataItem.costClass];
+            } else {
+              itemCost = $scope.cost[dataItemClass];
+            }
+
+            // If the item is not in the checked list yet, OR is set to false (unchecked) we add it's cost to the remaining
+            if(!$scope.checked[dataItemClass][dataItem.id] || $scope.checked[dataItemClass][dataItem.id] == false) {
+              $scope.remainingcost[dataItemClass] += itemCost;
             }
           });
-
-          var numClassItems = Object.keys($scope.data.items[itemClass]).length;
-          console.log("User has "+numClassItemsOwned+" of "+numClassItems+" from "+itemClass+", which cost "+$scope.cost[itemClass]+" each.");
-          $scope.remainingcost[itemClass] = (numClassItems - numClassItemsOwned)*$scope.cost[itemClass];
         });
-
-        console.log("Remaining costs are:");
-        console.log($scope.remainingcost);
 
         // Sum all these calculated costs into the total
         var totalCost = 0;
         Object.keys($scope.remainingcost).forEach(itemClass => {
           if(itemClass != "all") {
-            // Have to compare against NaN because we'll have some of the duplicate key names. (voice vs. voicelines, etc...)
-            if(!isNaN($scope.remainingcost[itemClass])) {
-              totalCost += $scope.remainingcost[itemClass];
-            }
+            totalCost += $scope.remainingcost[itemClass];
           }
         });
         $scope.remainingcost["all"] = totalCost;
