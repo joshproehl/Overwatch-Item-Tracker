@@ -1,6 +1,6 @@
 OWI.factory('Data', function() {
   var items = `{"skinsLegendary":{},"skinsEpic":{},"emotes":{},"intros":{},"sprays":{},"voicelines":{},"victoryposes":{},"icons":{}}`
-  var remainingCostsTemplate = `{"skinsLegendary":0,"skinsEpic":0,"emotes":0,"intros":0,"sprays":0,"voicelines":0,"victoryposes":0, "all":0}`
+  var remainingCostsTemplate = `{"skinsLegendary":0,"skinsEpic":0,"emotes":0,"intros":0,"sprays":0,"voicelines":0,"victoryposes":0, "icons":0, "all":0}`
   return {
     checked: {
       summergames2016: JSON.parse(items),
@@ -10,7 +10,7 @@ OWI.factory('Data', function() {
     cost: {
       // Lookup hashes for how much a particular class of item costs. Can be overridden by giving the item JSON a "costClass:" field matching
       // an item in this hash.
-      winterwonderland2016: {"skinsLegendary":3000, "skinsEpic":750, "emotes":750, "intros":750, "sprays":75, "voicelines":75, "victoryposes":225}
+      winterwonderland2016: {"skinsLegendary":3000, "skinsEpic":750, "emotes":750, "intros":750, "sprays":75, "voicelines":75, "victoryposes":225, "icons":0}
     },
     remainingcost: {
       winterwonderland2016: JSON.parse(remainingCostsTemplate)
@@ -763,31 +763,36 @@ OWI.factory('Data', function() {
             "name": "Winter Wonderland",
             "id": "winter-wonderland",
             "img": "./resources/WINTER_WONDERLAND_2016/sprays/winter-wonderland.png",
-            "allClass": true
+            "allClass": true,
+            "unlockOnly": true
           },
           {
             "name": "SnowReaper",
             "id": "snowreaper",
             "img": "./resources/WINTER_WONDERLAND_2016/sprays/snowreaper.png",
-            "allClass": true
+            "allClass": true,
+            "unlockOnly": true
           },
           {
             "name": "SnowMei",
             "id": "snowmei",
             "img": "./resources/WINTER_WONDERLAND_2016/sprays/snowmei.png",
-            "allClass": true
+            "allClass": true,
+            "unlockOnly": true
           },
           {
             "name": "SnowHog",
             "id": "snowhog",
             "img": "./resources/WINTER_WONDERLAND_2016/sprays/snowhog.png",
-            "allClass": true
+            "allClass": true,
+            "unlockOnly": true
           },
           {
             "name": "SnowCree",
             "id": "snowcree",
             "img": "./resources/WINTER_WONDERLAND_2016/sprays/snowcree.png",
-            "allClass": true
+            "allClass": true,
+            "unlockOnly": true
           }
         ],
         "voicelines": [

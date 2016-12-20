@@ -181,19 +181,44 @@ OWI.directive("update", ["Data", "StorageService", function(Data, StorageService
           $scope.remainingcost[dataItemClass] = 0;
 
           angular.forEach($scope.data.items[dataItemClass], function(dataItem, dataKey) {
-            var itemCost;
-            if(dataItem.costClass) {
-              itemCost = $scope.cost[dataItem.costClass];
-            } else {
-              itemCost = $scope.cost[dataItemClass];
-            }
+            if(!dataItem.unlockOnly) {
+              var itemCost;
+              if(dataItem.costClass) {
+                itemCost = $scope.cost[dataItem.costClass];
+              } else {
+                itemCost = $scope.cost[dataItemClass];
+              }
 
-            // If the item is not in the checked list yet, OR is set to false (unchecked) we add it's cost to the remaining
-            if(!$scope.checked[dataItemClass][dataItem.id] || $scope.checked[dataItemClass][dataItem.id] == false) {
-              $scope.remainingcost[dataItemClass] += itemCost;
+              // If the item is not in the checked list yet, OR is set to false (unchecked) we add it's cost to the remaining
+              if(!$scope.checked[dataItemClass][dataItem.id] || $scope.checked[dataItemClass][dataItem.id] == false) {
+                $scope.remainingcost[dataItemClass] += itemCost;
+              }
             }
           });
         });
+
+        // Handle the extra ornament sprays from winterwonderland2016
+        // Ideally these would be their own sprays in the data source, but I'm not ready to refactor quite that much yet.
+        if($scope.data.id === "winterwonderland2016") {
+          angular.forEach($scope.data.items["sprays"], function(dataItem, dataKey) {
+            if(!dataItem.unlockOnly) {
+              if(dataItem.hero) {
+                var itemCost;
+                if(dataItem.costClass) {
+                  itemCost = $scope.cost[dataItem.costClass];
+                } else {
+                  itemCost = $scope.cost["sprays"];
+                }
+
+                // If the item is not in the checked list yet, OR is set to false (unchecked) we add it's cost to the remaining
+                if(!$scope.checked["sprays"][dataItem.id+"-ornament"] || $scope.checked["sprays"][dataItem.id+"-ornament"] == false) {
+                  $scope.remainingcost["sprays"] += itemCost;
+                }
+              }
+            }
+          });
+        }
+
 
         // Sum all these calculated costs into the total
         var totalCost = 0;
